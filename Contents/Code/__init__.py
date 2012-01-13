@@ -41,7 +41,7 @@ def Category(sender, i):
   for sub in frontpage.xpath('//div[@id="playlist-2"]/ul[' + str(i) + ']/li'):
     try:
       title = sub.xpath('./a')[0].text.strip()
-      playlist_id = sub.xpath('./a')[0].get('href').split('=')[1]
+      playlist_id = sub.xpath('./a')[0].get('href').rsplit('-',1)[1]
       dir.Append(Function(DirectoryItem(Playlist, title=title), playlist_id=playlist_id))
     except:
       pass 
@@ -54,7 +54,7 @@ def Playlist(sender, playlist_id):
 
   for item in playlist:
     title       = item.xpath('./title')[0].text.replace('&amp;', '&').strip()
-    description = item.xpath('.//media:description', namespaces=RSS_NS)[0].text
+    description = item.xpath('.//media:description', namespaces=RSS_NS)[0].text.replace('&amp;', '&')
     duration    = item.xpath('./media:content/mvn:duration', namespaces=RSS_NS)[0].text
     duration    = int(duration) * 1000
     date        = item.xpath('./media:content/mvn:airDate', namespaces=RSS_NS)[0].text
