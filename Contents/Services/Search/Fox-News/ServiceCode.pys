@@ -2,6 +2,8 @@ import re
 
 SEARCH_URL = 'http://www.foxnews.com/search-results/search?&q=%s&mediatype=Video'
 
+ObjectContainer.art = R('art-default.png')
+
 ####################################################################################################
 
 def Search(query):
