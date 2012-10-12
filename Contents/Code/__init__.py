@@ -1,11 +1,11 @@
-BASE_URL  = 'http://video.foxnews.com'
+BASE_URL = 'http://video.foxnews.com'
 NAV_URL = 'http://video.foxnews.com/playlist/latest-video-latest-news/'
-RSS_FEED  = '%s/v/feed/playlist/%%s.xml' % BASE_URL
+RSS_FEED = '%s/v/feed/playlist/%%s.xml' % BASE_URL
 VIDEO_URL = 'http://video.foxnews.com/v/%s'
-RSS_NS    = {'mvn':'http://maven.net/mcr/4.1', 'media':'http://search.yahoo.com/mrss/'}
+RSS_NS = {'mvn':'http://maven.net/mcr/4.1', 'media':'http://search.yahoo.com/mrss/'}
 
 TITLE = 'Fox News'
-ART  = 'art-default.png'
+ART = 'art-default.jpg'
 ICON = 'icon-default.png'
 ICON_SEARCH = 'icon-search.png'
 
@@ -21,22 +21,25 @@ def Start():
   HTTP.CacheTime = 1800
 
 ###################################################################################################
-@handler("/video/foxnews", TITLE, thumb='icon-default.png', art='art-default.png')
+@handler("/video/foxnews", TITLE, thumb=ICON, art=ART)
 def MainMenu():
-  oc = ObjectContainer()
 
-  navpage = HTML.ElementFromURL(NAV_URL, errors='ignore')
+  oc = ObjectContainer()
+  navpage = HTML.ElementFromURL(NAV_URL)
+
   for category in navpage.xpath('//nav//ul/li'):
     title = category.xpath('./a')[0].text.strip()
     playlist_id = category.xpath('./a/@href')[0].split('playlist_id=')[1]
     oc.add(DirectoryObject(key=Callback(Playlist, playlist_id=playlist_id, title=title), title=title))
     
-  oc.add(SearchDirectoryObject(identifier="com.plexapp.plugins.foxnews", title = 'Search', summary = 'Search Videos...', prompt = 'Search:', thumb = R(ICON_SEARCH)))
+  oc.add(SearchDirectoryObject(identifier="com.plexapp.plugins.foxnews", title='Search', summary='Search Videos...', prompt='Search:', thumb=R(ICON_SEARCH)))
+
   return oc
 
 ###################################################################################################
-@route('/video/foxnews/playlists')
+@route('/video/foxnews/playlist/{playlist_id}')
 def Playlist(playlist_id, title):
+
   oc = ObjectContainer(title2 = title)
   playlist = XML.ElementFromURL(RSS_FEED % (playlist_id), errors='ignore').xpath('//item')
 
@@ -60,6 +63,6 @@ def Playlist(playlist_id, title):
       originally_available_at = date))
 
   if len(oc) == 0:
-    return MessageContainer('Empty', "There aren't any items")
+    return ObjectContainer('Empty', "There aren't any items")
   else:
     return oc
