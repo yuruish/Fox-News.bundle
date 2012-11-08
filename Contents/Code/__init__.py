@@ -27,7 +27,7 @@ def MainMenu():
   oc = ObjectContainer()
   navpage = HTML.ElementFromURL(NAV_URL)
 
-  for category in navpage.xpath('//nav//ul/li'):
+  for category in navpage.xpath('//div[@class="playlist"]//ul/li/a[contains(@href, "?playlist_id=")]/parent::li'):
     title = category.xpath('./a')[0].text.strip()
     playlist_id = category.xpath('./a/@href')[0].split('playlist_id=')[1]
     oc.add(DirectoryObject(key=Callback(Playlist, playlist_id=playlist_id, title=title), title=title))
