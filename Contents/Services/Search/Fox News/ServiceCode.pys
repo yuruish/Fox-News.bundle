@@ -2,23 +2,23 @@ BASE_URL = 'http://video.foxnews.com'
 SEARCH_URL = BASE_URL + '/search/results?q=%s&sort=1&start=0'
 
 ####################################################################################################
-
 def Search(query):
-  ObjectContainer.art = R('art-default.jpg')
+
   # Compute the URL and download the HTML
-  url = SEARCH_URL % String.Quote(query, usePlus = True)
+  url = SEARCH_URL % String.Quote(query, usePlus=True)
   search_page = HTML.ElementFromURL(url)
   search_results = search_page.xpath("//ul[contains(@class, 'video-search-items')]/li")
-   
+
   # Create a container to hold the results
-  c = ObjectContainer()
+  oc = ObjectContainer()
+
   for item in search_results:  
     try:
 
       # Although we have explicitly requested to only search for videos, it's possible that other
       # media types (such as pictures) have also been placed on the page. We should filter these
       # simply using their urls.
-     
+
       itemurl = item.xpath("./div[@class='info']//a")[0].get('href')
       if itemurl.startswith(BASE_URL) == False:
         itemurl = BASE_URL + itemurl
@@ -30,7 +30,8 @@ def Search(query):
       description = None
       try: description = "".join(info.xpath("./div[@class='info']//span//text()")).strip()
       except: pass
-      c.add(VideoClipObject(
+
+      oc.add(VideoClipObject(
         url = itemurl,
         title = title,
         thumb = thumb,
@@ -39,5 +40,5 @@ def Search(query):
 
     except:
       Log.Exception("Exception adding video result")
-      
-  return c
+
+  return oc
